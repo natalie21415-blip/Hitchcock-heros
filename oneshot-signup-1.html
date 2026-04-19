@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One-Shot Sign-Ups</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1209;
+    --parch: #f5ecd7;
+    --parch-dark: #e8d8b8;
+    --gold: #b8860b;
+    --gold-light: #d4a843;
+    --red: #8b2020;
+    --shadow: rgba(26,18,9,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #2a1f0e;
+    background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 8px);
+    min-height: 100vh;
+    font-family: 'Crimson Pro', Georgia, serif;
+    padding: 32px 16px;
+  }
+
+  .board {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .board-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .board-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    color: var(--gold-light);
+    letter-spacing: 0.12em;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    line-height: 1.2;
+  }
+
+  .board-sub {
+    color: #c8a96e;
+    font-size: 1.05rem;
+    margin-top: 6px;
+    font-style: italic;
+    opacity: 0.85;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0 28px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+  .divider span {
+    color: var(--gold-light);
+    font-size: 1.1rem;
+  }
+
+  .card {
+    background: var(--parch);
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    border-radius: 4px;
+    border: 1px solid var(--parch-dark);
+    box-shadow: 0 4px 24px var(--shadow), inset 0 0 60px rgba(180,150,80,0.08);
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+
+  .card-header {
+    background: var(--ink);
+    background-image: linear-gradient(135deg, #2a1f0e 0%, #1a1209 100%);
+    padding: 16px 22px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.15rem;
+    color: var(--gold-light);
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+  }
+
+  .badge {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    padding: 3px 9px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .badge-open { background: #1e4a1e; color: #7ecb7e; border: 1px solid #2d6b2d; }
+  .badge-full { background: #4a1e1e; color: #cb7e7e; border: 1px solid #6b2d2d; }
+  .badge-few  { background: #4a3a0e; color: #cbb07e; border: 1px solid #6b5020; }
+
+  .card-body {
+    padding: 18px 22px;
+    color: var(--ink);
+    border-bottom: 1px solid var(--parch-dark);
+  }
+
+  .description {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: #2d2010;
+    font-style: italic;
+    margin-bottom: 14px;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 20px;
+    margin-bottom: 14px;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .meta-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .meta-value {
+    font-size: 0.98rem;
+    color: #2d2010;
+  }
+
+  .char-box {
+    background: rgba(184,134,11,0.07);
+    border: 1px solid rgba(184,134,11,0.25);
+    border-radius: 3px;
+    padding: 10px 14px;
+    margin-bottom: 4px;
+  }
+
+  .char-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .char-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .char-tag {
+    background: var(--parch-dark);
+    border: 1px solid rgba(184,134,11,0.3);
+    border-radius: 2px;
+    padding: 2px 8px;
+    font-size: 0.88rem;
+    color: #3a2a10;
+  }
+
+  .card-footer {
+    padding: 13px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .seats {
+    font-size: 0.9rem;
+    color: #5a4020;
+  }
+  .seats strong { color: var(--red); }
+
+  .btn-sign {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    background: var(--ink);
+    color: var(--gold-light);
+    border: 1px solid var(--gold);
+    padding: 7px 18px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-sign:hover {
+    background: var(--gold);
+    color: var(--ink);
+  }
+  .btn-sign:disabled, .btn-full {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .section-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: #c8a96e;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+</style>
+</head>
+<body>
+
+<div class="board">
+  <div class="board-header">
+    <div class="board-title">⚔ One-Shot Adventurers Board ⚔</div>
+    <div class="board-sub">Pick a session. Show up. Make legends.</div>
+    <div class="divider"><span>✦</span></div>
+  </div>
+
+  <!-- Card 1 -->
+  <div class="section-label">📅 This Week</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Blood &amp; Sand</div>
+      <span class="badge badge-few">2 Seats Left</span>
+    </div>
+    <div class="card-body">
+      <div class="description">
+        You wake in chains beneath a roaring colosseum. The crowd wants blood — but freedom has a price. Fight, scheme, or charm your way out before the final bell rings.
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">📅 Date</span>
+          <span class="meta-value">Saturday, Apr 19 · 6 PM</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">⏱ Length</span>
+          <span class="meta-value">~3–4 hours</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">🎲 System</span>
+          <span class="meta-value">D&amp;D 5e</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">👤 GM</span>
+          <span class="meta-value">Steff</span>
+        </div>
+      </div>
+      <div class="char-box">
+        <div class="char-label">⚙ Character Requirements</div>
+        <ul class="char-list">
+          <li class="char-tag">Level 5</li>
+          <li class="char-tag">Any Class</li>
+          <li class="char-tag">Backstory (why were you captured?)</li>
+          <li class="char-tag">No flying races</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span class="seats">4 / 6 seats filled · <strong>2 remaining</strong></span>
+      <a class="btn-sign" href="#">Sign Me Up</a>
+    </div>
+  </div>
+
+  <!-- Card 2 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">The Last Lighthouse</div>
+      <span class="badge badge-open">Open</span>
+    </div>
+    <div class="card-body">
+      <div class="description">
+        A lighthouse keeper has gone missing. The coast guard won't go near it anymore. Something is keeping the light on — and it isn't human.
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">📅 Date</span>
+          <span class="meta-value">Sunday, Apr 27 · 2 PM</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">⏱ Length</span>
+          <span class="meta-value">~4 hours</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">🎲 System</span>
+          <span class="meta-value">Call of Cthulhu</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">👤 GM</span>
+          <span class="meta-value">Steff</span>
+        </div>
+      </div>
+      <div class="char-box">
+        <div class="char-label">⚙ Character Requirements</div>
+        <ul class="char-list">
+          <li class="char-tag">Premades provided</li>
+          <li class="char-tag">Horror-friendly player</li>
+          <li class="char-tag">No prior CoC needed</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span class="seats">1 / 5 seats filled · <strong>4 remaining</strong></span>
+      <a class="btn-sign" href="#">Sign Me Up</a>
+    </div>
+  </div>
+
+  <!-- Card 3 Full -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Heist at the Gilded Vault</div>
+      <span class="badge badge-full">Full</span>
+    </div>
+    <div class="card-body">
+      <div class="description">
+        The most secure bank in the realm holds something that doesn't belong to them. You've been hired to take it back — quietly.
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">📅 Date</span>
+          <span class="meta-value">Friday, Apr 25 · 7 PM</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">⏱ Length</span>
+          <span class="meta-value">~3 hours</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">🎲 System</span>
+          <span class="meta-value">D&amp;D 5e</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">👤 GM</span>
+          <span class="meta-value">Steff</span>
+        </div>
+      </div>
+      <div class="char-box">
+        <div class="char-label">⚙ Character Requirements</div>
+        <ul class="char-list">
+          <li class="char-tag">Level 6</li>
+          <li class="char-tag">Stealth or social focus</li>
+          <li class="char-tag">Criminal or rogue tie in backstory</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span class="seats">5 / 5 seats filled</span>
+      <a class="btn-sign btn-full" href="#">Session Full</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
